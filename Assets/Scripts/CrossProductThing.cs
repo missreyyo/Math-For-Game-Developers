@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using System;
 
 public class CrossProductThing : MonoBehaviour
 {
@@ -37,18 +38,40 @@ public class CrossProductThing : MonoBehaviour
             Vector3 up = hit.normal;
             Vector3 right = Vector3.Cross(up,lookDir).normalized;
             Vector3 forward = Vector3.Cross(right, up);
+            Quaternion turretRotation = Quaternion.LookRotation(forward,up);
+            Matrix4x4 turretToWorld = Matrix4x4.TRS(hitPos,turretRotation,Vector3.one);
+            
+            Vector3[] points = new Vector3[]
+            {
+                new Vector3(1,0,1),
+                new Vector3(-1,0,1),
+                new Vector3(-1,0,-1),
+                new Vector3(1,0,-1),
+                new Vector3(1,2,1),
+                new Vector3(-1,2,1),
+                new Vector3(-1,2,-1),
+                new Vector3(1,2,-1),
+            };
+            Gizmos.matrix = turretToWorld;
+
+            Gizmos.color = Color.red;
+            for (int i = 0; i < points.Length; i++)
+            {
+                Gizmos.DrawSphere(points[i], 0.05f);
+            }
 
             Handles.color = Color.white;
             Handles.DrawAAPolyLine(EditorGUIUtility.whiteTexture,5,headPos, hitPos);
 
             Handles.color = Color.green;
-            DrawRay(hitPos, up);
+            DrawRay(Vector3.zero, Vector3.right);
 
             Handles.color = Color.red;
-            DrawRay(hitPos,right);
+            DrawRay(Vector3.zero, Vector3.up);
 
             Handles.color = Color.yellow;
-            DrawRay(hitPos, forward);
+            DrawRay(Vector3.zero, Vector3.forward);
+            Gizmos.matrix = Matrix4x4.identity;
         }
         else
         {
