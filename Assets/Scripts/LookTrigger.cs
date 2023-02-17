@@ -8,8 +8,8 @@ using UnityEditor;
 
 public class LookTrigger : MonoBehaviour
 {
-    [Range(0f, 1f)]
-    public float preciseness = 0.5f;
+    [Range(0f, 90f)]
+    public float angleTresholdDeg = 30f;
     public Transform playerTransform;
     void OnDrawGizmos()
     {
@@ -18,13 +18,17 @@ public class LookTrigger : MonoBehaviour
         Vector2 playerLookDirection = playerTransform.right;
         Vector2 playerToTriggerDirection = (origin - playerPosition).normalized;
 
-        float lookAway = Vector2.Dot(playerToTriggerDirection,playerLookDirection);
-        bool isLookAt = lookAway < preciseness ? false : true;
+        float dot = Vector2.Dot(playerToTriggerDirection, playerLookDirection);
+        dot = Mathf.Clamp(dot, -1, 1);//-1 to 1
+        float angleRad = Mathf.Acos(dot);
+        float angleTreshRad = angleTresholdDeg * Mathf.Deg2Rad;
+
+        bool isLookAt = angleRad > angleTreshRad ? true : false;
         Gizmos.color = isLookAt ? Color.green : Color.red;
-        Gizmos.DrawLine(origin,playerPosition);
+        Gizmos.DrawLine(origin, playerPosition);
         Gizmos.color = Color.white;
-        Gizmos.DrawLine(playerPosition,playerPosition + playerLookDirection );
+        Gizmos.DrawLine(playerPosition, playerPosition + playerLookDirection);
 
     }
-   
+
 }
