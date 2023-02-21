@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 public class AdaptiveFoV : MonoBehaviour
 {
-    public Transform[] points;
+    public FoVPoint[] points;
     void OnDrawGizmos()
     {
         Camera camera = GetComponent<Camera>();
@@ -12,24 +13,35 @@ public class AdaptiveFoV : MonoBehaviour
         Vector2 cameraDirection = camera.transform.forward;
         Vector2 cameraPosition = camera.transform.position;
 
-        float lowestDotProduct = float.MaxValue;
+        float outerMostAngle = float.MinValue;
         Vector2 pointOutermost = default;
-        foreach(Transform pointTransform in points)
+        foreach(FoVPoint fovPt in points)
         {
-            Vector2 point = (Vector2)pointTransform.position - cameraPosition;
-            Vector2 directionToPoint = point.normalized;
-            float dot = Vector2.Dot(cameraDirection,directionToPoint);
-            if(dot< lowestDotProduct)
+            Vector2 point = (Vector2)fovPt.transform.position - cameraPosition;
+            float distanceToPoint = point.magnitude;
+            Vector2 directionToPoint = point / distanceToPoint; // normalize
+            
+            float angleToPoint = Mathf.Acos(Vector2.Dot(cameraDirection,directionToPoint));
+            float radiusAngularSpan = Mathf.Asin(fovPt.radius / distanceToPoint );
+            float angularDeviation = angleToPoint + radiusAngularSpan;
+
+            if(angleToPoint > outerMostAngle)
             {
-                lowestDotProduct = dot;
-                pointOutermost = pointTransform.position;
+                outerMostAngle = angleToPoint;
+                pointOutermost = fovPt.transform.position;
             }
             
         }
-        float angRad = Mathf.Acos(lowestDotProduct);
-        camera.fieldOfView = angRad *2 * Mathf.Rad2Deg;
+        
+        camera.fieldOfView = outerMostAngle *2 * Mathf.Rad2Deg;
         Gizmos.DrawLine(cameraPosition, pointOutermost);
-
-
+        DrawPointRadii();
+    }
+    void DrawPointRadii() { 
+    
+        foreach(FoVPoint foVPoint in points)
+        {
+            Gizmos.DrawWireSphere(foVPoint.transform.position, foVPoint.radius);
+        }
     }
 }
