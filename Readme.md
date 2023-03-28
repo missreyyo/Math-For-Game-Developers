@@ -20,7 +20,7 @@ These are the real Bezier curves. It will occur when we add P2 as a third point.
 
 When I see that firstly, I shocked. I realized that there are many things that can be done in Unity using math.
 
-
+:blush:
 
 
 
