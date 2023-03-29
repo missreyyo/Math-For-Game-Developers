@@ -1,5 +1,5 @@
 
-# **Bézier  Curves**
+# **Bézier  Curves** :blush:
 It was the best topic for me while I was learning math for developing game: Bézier curves. We can make curves with lines. How can we make bezier curves?
 #
 ## Linear Interpolation (Lerp)
